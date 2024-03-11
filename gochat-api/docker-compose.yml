@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_DB: gochat
+      POSTGRES_USER: todayblue
+      POSTGRES_PASSWORD: password1234
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
