@@ -23,10 +23,14 @@ func (u *UserService) LoginUser(email, password string) (*domain.LoginResponse, 
 	return u.repo.LoginUser(email, password)
 }
 
+func (u *UserService) LogoutUser(refreshToken string) error {
+	return u.repo.LogoutUser(refreshToken)
+}
+
 func (u *UserService) GetUserByUsername(username string) (*domain.User, error) {
 	return u.repo.GetUserByUsername(username)
 }
 
-func (u *UserService) RefreshTokens(refreshToken string) (*domain.Tokens, error) {
+func (u *UserService) RefreshTokens(refreshToken string) (*domain.LoginResponse, error) {
 	return u.repo.RefreshTokens(refreshToken)
 }

@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"go-chat/internals/adapters/cache"
 	"go-chat/internals/adapters/handler"
-	"go-chat/internals/adapters/handler/middleware"
 	"go-chat/internals/adapters/repository"
 	"go-chat/internals/config"
 	"go-chat/internals/core/domain"
@@ -19,6 +19,7 @@ import (
 var (
 	userService *services.UserService
 	bookService *services.BookService
+	authService *services.AuthService
 )
 
 func main() {
@@ -35,29 +36,38 @@ func main() {
 		panic(err)
 	}
 
+	redisCache, err := cache.NewRedisCache("127.0.0.1:6379", "")
+	if err != nil {
+		panic(err)
+	}
+
 	db.AutoMigrate(&domain.User{}, &domain.Book{})
-	store := repository.NewDB(db)
-	bookService = services.NewBookService(store)
+
+	store := repository.NewDB(db, redisCache)
+
+	authService = services.NewAuthService(store)
 	userService = services.NewUserService(store)
+	bookService = services.NewBookService(store)
 	InitRoutes()
 }
 
 func InitRoutes() {
 	app := fiber.New()
 	app.Use(cors.New())
-	authMiddleware := middleware.AuthMiddleware
 
-	router := app.Group("/api")
+	middlewareHandler := handler.NewAuthHandlers(authService)
 	userHandler := handler.NewUserHandlers(userService)
 	bookHandler := handler.NewBookHandlers(bookService)
 
+	router := app.Group("/api")
 	authRouter := router.Group("/auth")
-	authRouter.Post("/login", userHandler.Login)
 	authRouter.Post("/register", userHandler.Register)
+	authRouter.Post("/login", userHandler.LoginUser)
+	authRouter.Get("/logout", userHandler.LogoutUser)
 	authRouter.Get("/refresh", userHandler.RefreshTokens)
 
-	router.Get("/books", authMiddleware, bookHandler.GetBooks)
-	router.Post("/books", authMiddleware, bookHandler.CreateBook)
+	router.Get("/books", middlewareHandler.Middleware, bookHandler.GetBooks)
+	router.Post("/books", middlewareHandler.Middleware, bookHandler.CreateBook)
 
 	err := app.Listen(":8080")
 	if err != nil {

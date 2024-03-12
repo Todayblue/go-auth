@@ -2,10 +2,12 @@ package domain
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type CommonModel struct {
-	ID        uint       `gorm:"primary_key" json:"id"`
+	ID        uuid.UUID  `gorm:"type:uuid;primary_key;default:uuid_generate_v4()" json:"id"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `gorm:"index" json:"deleted_at"`
@@ -35,14 +37,4 @@ type LoginResponse struct {
 	Username     string `json:"username"`
 	AccessToken  string `json:"-"`
 	RefreshToken string `json:"-"`
-}
-
-type Tokens struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-}
-
-type Book struct {
-	CommonModel
-	Title string `json:"title"`
 }
