@@ -13,7 +13,6 @@ type Config struct {
 	DBPassword            string        `envconfig:"DB_PASSWORD"`
 	DBName                string        `envconfig:"DB_NAME"`
 	DBPort                string        `envconfig:"DB_PORT"`
-	ClientOrigin          string        `envconfig:"CLIENT_ORIGIN"`
 	JWTAccessTokenSecret  string        `envconfig:"JWT_ACCESS_TOKEN"`
 	AccessTokenExpiredIn  time.Duration `envconfig:"ACCESS_TOKEN_EXPIRED_IN"`
 	JWTRefreshTokenSecret string        `envconfig:"JWT_REFRESH_TOKEN"`
@@ -32,7 +31,6 @@ func LoadConfig() (Config, error) {
 		DBPassword:            os.Getenv("DB_PASSWORD"),
 		DBName:                os.Getenv("DB_NAME"),
 		DBPort:                os.Getenv("DB_PORT"),
-		ClientOrigin:          os.Getenv("CLIENT_ORIGIN"),
 		JWTAccessTokenSecret:  os.Getenv("JWT_ACCESS_TOKEN"),
 		JWTRefreshTokenSecret: os.Getenv("JWT_REFRESH_TOKEN"),
 	}
